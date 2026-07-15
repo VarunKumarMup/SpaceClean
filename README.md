@@ -53,5 +53,9 @@ feature-graphic sources, and an internal-testing checklist.
 
 ## License
 
-Proprietary — source published for reference; all rights reserved.
-© Varun Kumar Muppuri · varunkumarmuppuri@gmail.com
+**Source-available, no redistribution.** You're welcome to read the code, learn from it,
+and build it for your own personal use — but redistributing the source or compiled builds
+(including publishing to any app store) is not permitted. The only official distribution
+channel is the developer's own Google Play listing. See [LICENSE](LICENSE) for the full terms.
+
+© 2026 Varun Kumar Muppuri · varunkumarmuppuri@gmail.com

@@ -1,0 +1,55 @@
+SpaceClean Source-Available License
+Version 1.0, July 2026
+
+Copyright (c) 2026 Varun Kumar Muppuri (varunkumarmuppuri@gmail.com)
+All rights reserved.
+
+The source code of SpaceClean ("the Software") is made publicly available for
+transparency and educational purposes. It is NOT open-source under the OSI
+definition. By accessing or using this repository you agree to these terms.
+
+1. PERMITTED
+   You may, free of charge and for personal, non-commercial purposes only:
+   a. view, clone, and study the source code;
+   b. build and run the Software on devices you own, for your own private use;
+   c. fork the repository on GitHub solely as permitted by, and to the extent
+      required by, the GitHub Terms of Service (e.g. to propose changes back
+      to this repository);
+   d. quote small portions of the code (with attribution) in articles,
+      reviews, or educational material.
+
+2. PROHIBITED
+   Except with the copyright holder's prior written permission, you may NOT:
+   a. redistribute the Software or any modified version of it, in source or
+      binary form, by any means — including publishing it to any app store
+      (Google Play or otherwise), website, package registry, torrent, or
+      file-sharing service;
+   b. sell, rent, lease, sublicense, or otherwise commercialize the Software
+      or any derivative of it;
+   c. distribute compiled builds (APK/AAB) of the Software to any third party;
+   d. remove or alter copyright, license, or attribution notices;
+   e. use the "SpaceClean" name, icon, or branding for any other product.
+
+3. CONTRIBUTIONS
+   By submitting a contribution (e.g. a pull request), you grant the copyright
+   holder a perpetual, worldwide, irrevocable, royalty-free license to use,
+   modify, relicense, and distribute your contribution as part of the
+   Software, including in the commercial builds published by the copyright
+   holder.
+
+4. TERMINATION
+   Any violation of these terms automatically terminates your rights under
+   this license. On termination you must delete all copies of the Software in
+   your possession.
+
+5. NO WARRANTY / NO LIABILITY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL
+   THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY —
+   INCLUDING ANY LOSS OF DATA OR FILES — ARISING FROM THE SOFTWARE OR THE USE
+   OF OR OTHER DEALINGS IN THE SOFTWARE.
+
+6. OFFICIAL DISTRIBUTION
+   The only authorized distribution channel for the compiled app is the
+   copyright holder's own listing on the Google Play Store.
