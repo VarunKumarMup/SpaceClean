@@ -1,0 +1,72 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbg" x1="0" y1="0" x2="1024" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A0A12"/>
+      <stop offset="1" stop-color="#050509"/>
+    </linearGradient>
+    <radialGradient id="fc" cx="0.12" cy="0.1" r="0.7">
+      <stop offset="0" stop-color="#00F0FF" stop-opacity="0.40"/>
+      <stop offset="1" stop-color="#00F0FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fv" cx="0.85" cy="0.0" r="0.7">
+      <stop offset="0" stop-color="#9D00FF" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#9D00FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fb" cx="0.5" cy="1.1" r="0.9">
+      <stop offset="0" stop-color="#2563EB" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#2563EB" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ftitle" x1="120" y1="0" x2="640" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#7EF6FF"/>
+    </linearGradient>
+    <linearGradient id="fspark" x1="740" y1="150" x2="900" y2="350" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#00F0FF"/>
+    </linearGradient>
+    <linearGradient id="fring" x1="700" y1="120" x2="940" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00F0FF"/>
+      <stop offset="1" stop-color="#9D00FF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#fbg)"/>
+  <rect width="1024" height="500" fill="url(#fc)"/>
+  <rect width="1024" height="500" fill="url(#fv)"/>
+  <rect width="1024" height="500" fill="url(#fb)"/>
+
+  <!-- Text block -->
+  <text x="96" y="210" font-family="Segoe UI, Arial, sans-serif" font-size="84" font-weight="800"
+        fill="url(#ftitle)" letter-spacing="-1">SpaceClean</text>
+  <text x="100" y="270" font-family="Segoe UI, Arial, sans-serif" font-size="33" font-weight="600"
+        fill="#C7D2E5">Private, 100% offline storage cleaner</text>
+
+  <!-- Feature pills -->
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600">
+    <rect x="100" y="320" width="180" height="48" rx="24" fill="#101622" stroke="#00F0FF" stroke-opacity="0.35"/>
+    <text x="190" y="351" text-anchor="middle" fill="#9FEAF2">No internet</text>
+    <rect x="296" y="320" width="150" height="48" rx="24" fill="#101622" stroke="#9D00FF" stroke-opacity="0.35"/>
+    <text x="371" y="351" text-anchor="middle" fill="#D4B3FF">No ads</text>
+    <rect x="462" y="320" width="190" height="48" rx="24" fill="#101622" stroke="#00E5A0" stroke-opacity="0.35"/>
+    <text x="557" y="351" text-anchor="middle" fill="#9BF0D0">No tracking</text>
+  </g>
+
+  <!-- Right-side emblem: broom sweeping sparkles -->
+  <g transform="translate(830 250)">
+    <circle cx="0" cy="0" r="150" fill="#FFFFFF" opacity="0.06"/>
+    <g transform="translate(-40 -70)">
+      <path d="M-22,54 L22,54 L44,124 Q0,106 -44,124 Z" fill="#FFFFFF"/>
+      <g stroke="#3A4F8C" stroke-opacity="0.28" stroke-width="7" stroke-linecap="round">
+        <path d="M-10,62 L-22,116"/>
+        <path d="M0,62 L0,120"/>
+        <path d="M10,62 L26,116"/>
+      </g>
+      <path d="M-24,52 L24,52" stroke="#FFC24A" stroke-width="15" stroke-linecap="round"/>
+      <path d="M18,-42 L-6,50" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round"/>
+    </g>
+    <path fill="#FFD54A"
+          d="M96,-92 C100.3,-72 103,-69.2 120,-65 C103,-60.8 100.3,-58 96,-38 C91.7,-58 89,-60.8 72,-65 C89,-69.2 91.7,-72 96,-92 Z"/>
+    <path fill="#FFFFFF"
+          d="M120,-44 C122.1,-33 123.6,-31.4 132,-29 C123.6,-26.6 122.1,-25 120,-14 C117.9,-25 116.4,-26.6 108,-29 C116.4,-31.4 117.9,-33 120,-44 Z"/>
+  </g>
+</svg>

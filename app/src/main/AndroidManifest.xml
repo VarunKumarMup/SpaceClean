@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        MANAGE_EXTERNAL_STORAGE : API 30+ (Android 11+) — full file-system access granted
+                                  via the "All files access" toggle in Settings. Required
+                                  because scoped storage blocks arbitrary file reads on
+                                  API 30+. Cannot be requested via a runtime dialog.
+
+        READ_EXTERNAL_STORAGE   : API ≤ 29 only (maxSdkVersion="29") — normal runtime
+                                  permission for reading the external storage on older devices.
+        WRITE_EXTERNAL_STORAGE  : API ≤ 29 only (maxSdkVersion="29") — needed to delete
+                                  files on pre-scoped-storage Android. On API 30+ deletion
+                                  is handled by MediaStore.createDeleteRequest() instead.
+
+        READ_MEDIA_IMAGES / VIDEO / AUDIO : declared for completeness; on API 33+ these
+                                  are the fine-grained replacements for READ_EXTERNAL_STORAGE.
+                                  MANAGE_EXTERNAL_STORAGE is a superset of all three.
+
+        No INTERNET permission is declared — the app is 100% offline.
+    -->
+
+    <!-- Android 11+ (API 30+): full file-system access via Settings toggle -->
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
+    <!-- Legacy: active ONLY on API ≤ 29; ignored on API 30+ by the OS -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+
+    <!-- Granular media permissions (API 33+) — superset covered by MANAGE_EXTERNAL_STORAGE -->
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VIDEO"
+        tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_AUDIO"
+        tools:ignore="ScopedStorage" />
+
+    <!-- Required to enumerate all installed packages for the App Storage manager -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <!-- Lets the App Storage manager launch the system uninstall dialog for other apps. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
+    <!--
+        Strip ACCESS_NETWORK_STATE that Media3/ExoPlayer's manifest injects. ExoPlayer is only
+        used to preview LOCAL files here, so no network-state check is needed. Removing it keeps
+        the app's promise of ZERO network permissions literally true.
+    -->
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        tools:node="remove" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SpaceClean">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SpaceClean"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
