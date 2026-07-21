@@ -8,3 +8,10 @@
 
 # Compose tooling sometimes references these; harmless to keep.
 -dontwarn org.jetbrains.annotations.**
+
+# ── TensorFlow Lite (on-device AI Photo Cleanup) ────────────────────────────
+# TFLite calls native methods and instantiates classes via JNI/reflection, so its
+# runtime classes must survive R8 or inference crashes only in release builds.
+-keep class org.tensorflow.lite.** { *; }
+-keepclasseswithmembernames class * { native <methods>; }
+-dontwarn org.tensorflow.lite.**

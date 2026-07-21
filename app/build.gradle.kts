@@ -62,7 +62,10 @@ android {
     buildFeatures {
         compose = true
     }
-}
+    androidResources {
+        // The on-device AI model must stay uncompressed so TFLite can memory-map it.
+        noCompress += "tflite"
+    }}
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
@@ -78,6 +81,8 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.navigation.compose)
+    // On-device AI (fully offline — bundled model, no networking, no INTERNET permission).
+    implementation(libs.tensorflow.lite)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

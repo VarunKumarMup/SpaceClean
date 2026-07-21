@@ -8,6 +8,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.varunkumar.spaceclean.scanner.AiScanResult
 import io.github.varunkumar.spaceclean.scanner.AppInfo
 import io.github.varunkumar.spaceclean.scanner.DeleteEffects
 import io.github.varunkumar.spaceclean.scanner.DeleteRequest
@@ -71,6 +72,13 @@ sealed class TrashState {
     data class Error(val message: String)              : TrashState()
 }
 
+sealed class AiState {
+    object Idle                                           : AiState()
+    data class Loading(val done: Int, val total: Int)     : AiState()
+    data class Success(val result: AiScanResult)          : AiState()
+    data class Error(val message: String)                 : AiState()
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // UI State
 // ─────────────────────────────────────────────────────────────────────────────
@@ -94,6 +102,7 @@ data class HomeUiState(
     val oldFilesState:  ScanState       = ScanState.Idle,
     val duplicatesState: DuplicatesState = DuplicatesState.Idle,
     val trashState:      TrashState      = TrashState.Idle,
+    val aiState:         AiState         = AiState.Idle,
 
     // Smart auto-selection — populated for PHOTOS
     val recommendedForDeletion: Set<Uri>              = emptySet(),
@@ -132,6 +141,7 @@ enum class QuickCleanCategory(
     FOLDERS   ("folders",    "Leftover folders", "Empty folders from uninstalled apps",        true),
     DOWNLOADS ("downloads",  "Download junk",    "Old APKs, ZIPs, logs & temp downloads",      true),
     USELESS   ("useless",    "Useless files",    "GIFs, temp, log & abandoned partial files",  true),
+    AI        ("ai",         "AI photo junk",    "Blurry shots & worse copies the AI found",    true),
     DOCS      ("docs",       "Documents",        "PDFs & Office files — review these yourself", false);
 
     companion object {
@@ -343,6 +353,23 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
             runCatching { repository.getDuplicateGroups() }
                 .onSuccess { groups -> _uiState.update { it.copy(duplicatesState = DuplicatesState.Success(groups)) } }
                 .onFailure { e -> _uiState.update { it.copy(duplicatesState = DuplicatesState.Error(e.message ?: "Scan failed")) } }
+        }
+    }
+
+    // ── AI photo pass (on-device model) ─────────────────────────────────────────
+
+    fun scanAi() {
+        if (!_uiState.value.permissionGranted) return
+        if (_uiState.value.aiState is AiState.Loading) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(aiState = AiState.Loading(0, 0)) }
+            runCatching {
+                repository.getAiPhotoResult { done, total ->
+                    _uiState.update { it.copy(aiState = AiState.Loading(done, total)) }
+                }
+            }
+                .onSuccess { result -> _uiState.update { it.copy(aiState = AiState.Success(result)) } }
+                .onFailure { e -> _uiState.update { it.copy(aiState = AiState.Error(e.message ?: "AI scan failed")) } }
         }
     }
 
@@ -571,6 +598,15 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
                 groups.map { g -> g.filter { it.uri !in deletedUris } }.filter { it.size >= 2 }
             ) else this
 
+        fun AiState.pruned() = if (this is AiState.Success) AiState.Success(
+            result.copy(
+                similarGroups = result.similarGroups
+                    .map { g -> g.filter { it.uri !in deletedUris } }.filter { it.size >= 2 },
+                blurry      = result.blurry.filter { it.uri !in deletedUris },
+                screenshots = result.screenshots.filter { it.uri !in deletedUris },
+            )
+        ) else this
+
         _uiState.update { s ->
             s.copy(
                 photosState            = s.photosState.pruned(),
@@ -584,6 +620,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
                 largestState           = s.largestState.pruned(),
                 oldFilesState          = s.oldFilesState.pruned(),
                 duplicatesState        = s.duplicatesState.pruned(),
+                aiState                = s.aiState.pruned(),
                 recommendedForDeletion = s.recommendedForDeletion - deletedUris,
                 bestPairMap            = s.bestPairMap.filterKeys { it !in deletedUris },
                 // If the open viewer/compare target was just deleted, clear it so the

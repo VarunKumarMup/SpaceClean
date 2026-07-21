@@ -40,6 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.AutoDelete
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.ChevronRight
@@ -90,6 +91,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import io.github.varunkumar.spaceclean.AiState
 import io.github.varunkumar.spaceclean.AppStorageState
 import io.github.varunkumar.spaceclean.DuplicatesState
 import io.github.varunkumar.spaceclean.HomeUiState
@@ -438,6 +440,13 @@ fun MainScreen(navController: NavHostController, viewModel: ScanViewModel) {
                         isCharging = sysHealth.isCharging,
                         modifier   = Modifier.padding(horizontal = 16.dp),
                     )
+                    Spacer(Modifier.height(14.dp))
+
+                    AiCleanupCard(
+                        state    = uiState.aiState,
+                        onClick  = { if (requestPerm()) navController.navigate(Screen.AiCleanup.route) },
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
                     Spacer(Modifier.height(22.dp))
 
                     // ── Cleanup suggestions (only after results exist) ──────────
@@ -550,6 +559,16 @@ internal fun recommendedCleanupItems(uiState: HomeUiState): List<CleanupItem> {
         (uiState.uselessState as? ScanState.Success)?.files
             ?.forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Useless file") } }
     }
+    if (QuickCleanCategory.AI.key in cats) {
+        (uiState.aiState as? AiState.Success)?.result?.let { ai ->
+            ai.blurry.forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Blurry (AI)") } }
+            ai.similarGroups.forEach { group ->
+                val keeper = aiKeeper(group)
+                group.filter { it.uri != keeper.uri }
+                    .forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Similar (AI)") } }
+            }
+        }
+    }
     return out.values.sortedByDescending { it.file.sizeBytes }
 }
 
@@ -569,6 +588,11 @@ internal fun bigFileSuggestions(uiState: HomeUiState, alreadyListed: Set<Uri>): 
 
 internal fun recommendedCleanupFiles(uiState: HomeUiState): List<ScannedFile> =
     recommendedCleanupItems(uiState).map { it.file }
+
+/** Best photo to KEEP in an AI-similar group: highest resolution, then largest, then newest. */
+internal fun aiKeeper(group: List<ScannedFile>): ScannedFile =
+    group.maxByOrNull { it.widthPx.toLong() * it.heightPx.toLong() * 1_000_000L +
+        it.sizeBytes + it.dateModifiedMs / 1_000_000L } ?: group.first()
 
 // Maps ScanType → ScanState, bridging AppStorageState / DuplicatesState.
 private fun tileState(type: ScanType, uiState: HomeUiState): ScanState =
@@ -926,6 +950,64 @@ private fun HeroScanGauge(
                     fontWeight = FontWeight.Black,
                 )
             }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI Photo Cleanup entry card
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun AiCleanupCard(state: AiState, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val subtitle = when (state) {
+        is AiState.Loading -> if (state.total > 0) "Analyzing ${state.done}/${state.total} photos…" else "Starting on-device AI…"
+        is AiState.Success -> {
+            val r = state.result
+            val junk = r.similarGroups.sumOf { (it.size - 1).coerceAtLeast(0) } + r.blurry.size + r.screenshots.size
+            if (!r.available) "Model unavailable on this device"
+            else if (junk == 0) "Analyzed ${r.analyzedCount} photos · all good"
+            else "$junk photos to review · blurry, similar & screenshots"
+        }
+        is AiState.Error -> "Tap to try again"
+        AiState.Idle -> "Find blurry, similar & screenshot photos — on-device"
+    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(Brush.linearGradient(listOf(NeonViolet.copy(0.22f), ElectricCyan.copy(0.10f))))
+            .border(1.dp, NeonViolet.copy(0.4f), RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Box(
+            modifier = Modifier.size(46.dp)
+                .background(NeonViolet.copy(0.2f), RoundedCornerShape(14.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Rounded.AutoAwesome, null, tint = NeonViolet, modifier = Modifier.size(26.dp))
+        }
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("AI Photo Cleanup", style = MaterialTheme.typography.titleSmall,
+                    color = TextPrimary, fontWeight = FontWeight.Black)
+                Box(Modifier.clip(RoundedCornerShape(4.dp)).background(NeonViolet.copy(0.25f))
+                    .padding(horizontal = 5.dp, vertical = 1.dp)) {
+                    Text("NEW", style = MaterialTheme.typography.labelSmall, color = NeonViolet,
+                        fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                }
+            }
+            Text(subtitle, style = MaterialTheme.typography.labelMedium, color = TextSecondary,
+                maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+        if (state is AiState.Loading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                Modifier.size(22.dp), color = NeonViolet, strokeWidth = 2.dp)
+        } else {
+            Icon(Icons.Rounded.ChevronRight, null, tint = NeonViolet, modifier = Modifier.size(22.dp))
         }
     }
 }

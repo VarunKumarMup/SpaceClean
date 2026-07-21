@@ -33,6 +33,7 @@ sealed class Screen(val route: String) {
     object Duplicates  : Screen("duplicates")
     object Trash       : Screen("trash")
     object QuickClean  : Screen("quick_clean")
+    object AiCleanup   : Screen("ai_cleanup")
 
     // One parameterised route covers the file-list managers
     // (PHOTOS/VIDEOS/DOCUMENTS/AUDIO/DOWNLOADS/CHAT_MEDIA/EMPTY_FOLDERS).
@@ -102,6 +103,11 @@ fun SpaceCleanNavGraph(navController: NavHostController, viewModel: ScanViewMode
         // ── Quick Clean review (recommended items before deletion) ──────────
         composable(Screen.QuickClean.route) {
             QuickCleanScreen(navController = navController, viewModel = viewModel)
+        }
+
+        // ── AI Photo Cleanup (on-device model) ──────────────────────────────
+        composable(Screen.AiCleanup.route) {
+            AiCleanupScreen(navController = navController, viewModel = viewModel)
         }
 
         // ── Global search ───────────────────────────────────────────────────

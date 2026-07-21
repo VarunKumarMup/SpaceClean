@@ -19,6 +19,7 @@ class ScanRepository(private val context: Context) {
     private val advCleaners   = AdvancedCleaners(context)
     private val dupScanner    = DuplicateScanner(context)
     private val appTrash      = AppTrash(context)
+    private val aiScanner     = AiPhotoScanner(context)
 
     // ── Photos — exact duplicates + similar/burst photos combined ─────────────
 
@@ -77,6 +78,11 @@ class ScanRepository(private val context: Context) {
 
     suspend fun getDownloadJunk(): List<ScannedFile> =
         withContext(Dispatchers.IO) { scanner.findDownloadJunk() }
+
+    // ── AI photo pass (on-device model: similar groups, blurry, screenshots) ───
+
+    suspend fun getAiPhotoResult(progress: (Int, Int) -> Unit): AiScanResult =
+        aiScanner.scan(progress)
 
     // ── Useless files (gifs, temp, logs, abandoned partial downloads) ──────────
 
