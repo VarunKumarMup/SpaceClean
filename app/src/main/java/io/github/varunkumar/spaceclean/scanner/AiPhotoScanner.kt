@@ -44,6 +44,7 @@ class AiPhotoScanner(private val context: Context) {
             try {
                 val photos = queryRecentPhotos()
                 val embeddings = HashMap<Uri, FloatArray>()
+                val hashes      = HashMap<Uri, Long>()
                 val blurry      = mutableListOf<ScannedFile>()
                 val screenshots = mutableListOf<ScannedFile>()
                 val tags        = HashMap<Uri, String>()
@@ -54,6 +55,7 @@ class AiPhotoScanner(private val context: Context) {
                     val bmp = loadBitmap(photo.uri) ?: continue
                     val result = classifier.classify(bmp)
                     val focus  = focusScore(bmp)
+                    hashes[photo.uri] = dHash(bmp)
                     bmp.recycle()
                     analyzed++
 
@@ -65,7 +67,7 @@ class AiPhotoScanner(private val context: Context) {
                     if (focus in 0.0..BLUR_THRESHOLD) blurry += photo
                 }
 
-                val groups = clusterBySimilarity(photos.filter { embeddings.containsKey(it.uri) }, embeddings)
+                val groups = clusterBySimilarity(photos.filter { hashes.containsKey(it.uri) }, embeddings, hashes)
                 progress(photos.size, photos.size)
 
                 AiScanResult(
@@ -83,9 +85,16 @@ class AiPhotoScanner(private val context: Context) {
 
     // ── Similarity clustering (union-find over cosine similarity) ───────────────
 
+    /**
+     * Groups only photos that are **visually near-identical** — the perceptual hash (dHash)
+     * Hamming distance is the safety gate, so two *different* subjects (e.g. two people who
+     * both happen to wear jeans) can never be grouped, no matter what the content model thinks.
+     * The neural embedding is an additional required condition, never a relaxation.
+     */
     private fun clusterBySimilarity(
         photos: List<ScannedFile>,
         embeddings: Map<Uri, FloatArray>,
+        hashes: Map<Uri, Long>,
     ): List<List<ScannedFile>> {
         val n = photos.size
         if (n < 2) return emptyList()
@@ -94,16 +103,44 @@ class AiPhotoScanner(private val context: Context) {
         fun union(a: Int, b: Int) { parent[find(a)] = find(b) }
 
         for (i in 0 until n) {
-            val ei = embeddings[photos[i].uri] ?: continue
+            val hi = hashes[photos[i].uri] ?: continue
             for (j in i + 1 until n) {
-                val ej = embeddings[photos[j].uri] ?: continue
-                if (AiPhotoClassifier.cosine(ei, ej) >= SIMILARITY_THRESHOLD) union(i, j)
+                val hj = hashes[photos[j].uri] ?: continue
+                if (hamming(hi, hj) > HASH_MAX_DISTANCE) continue          // must look near-identical
+                val ei = embeddings[photos[i].uri]
+                val ej = embeddings[photos[j].uri]
+                val contentAgrees = ei == null || ej == null ||
+                    AiPhotoClassifier.cosine(ei, ej) >= SIMILARITY_THRESHOLD
+                if (contentAgrees) union(i, j)
             }
         }
         return (0 until n).groupBy { find(it) }.values
             .filter { it.size >= 2 }
             .map { idxs -> idxs.map { photos[it] } }
     }
+
+    // ── Perceptual hash (dHash) ─────────────────────────────────────────────────
+
+    private fun dHash(bitmap: Bitmap): Long {
+        val w = 9; val h = 8
+        val small = Bitmap.createScaledBitmap(bitmap, w, h, true)
+        val px = IntArray(w * h)
+        small.getPixels(px, 0, w, 0, 0, w, h)
+        if (small !== bitmap) small.recycle()
+        var hash = 0L; var bit = 0
+        for (y in 0 until h) for (x in 0 until 8) {
+            val left  = luma(px[y * w + x])
+            val right = luma(px[y * w + x + 1])
+            if (left > right) hash = hash or (1L shl bit)
+            bit++
+        }
+        return hash
+    }
+
+    private fun luma(p: Int) =
+        0.299 * (p shr 16 and 0xFF) + 0.587 * (p shr 8 and 0xFF) + 0.114 * (p and 0xFF)
+
+    private fun hamming(a: Long, b: Long) = java.lang.Long.bitCount(a xor b)
 
     // ── Heuristics ──────────────────────────────────────────────────────────────
 
@@ -199,8 +236,13 @@ class AiPhotoScanner(private val context: Context) {
     companion object {
         private const val MAX_PHOTOS          = 500
         private const val MIN_SIZE_BYTES      = 40L * 1024
-        private const val SIMILARITY_THRESHOLD = 0.86f
-        private const val BLUR_THRESHOLD       = 55.0      // variance below this ≈ visibly blurry
+        // Photos must be near-identical (≤10 of 64 hash bits differ) to ever group — the
+        // hard safety gate that stops distinct photos of people being flagged as duplicates.
+        private const val HASH_MAX_DISTANCE    = 10
+        private const val SIMILARITY_THRESHOLD = 0.80f     // secondary content check only
+        // Variance below this ≈ SEVERELY out of focus. Kept low on purpose so sharp portraits
+        // with a soft background are not misflagged; blurry items are only ever *suggested*.
+        private const val BLUR_THRESHOLD       = 18.0
         private val SCREEN_LABELS = setOf(
             "web site", "menu", "monitor", "comic book", "envelope", "packet", "book jacket",
         )

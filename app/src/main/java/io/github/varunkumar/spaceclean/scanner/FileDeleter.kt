@@ -145,15 +145,26 @@ class FileDeleter(context: Context) {
      * `createTrashRequest` requires. MediaStore row ids are shared across the Files
      * collection and the typed collections, so remapping by id is lossless.
      */
-    private fun typedMediaUri(f: ScannedFile): Uri {
-        val id = runCatching { ContentUris.parseId(f.uri) }.getOrNull() ?: return f.uri
-        val collection = when {
-            f.name.isImageName() -> MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            f.name.isVideoName() -> MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            f.name.isAudioName() -> MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            else                 -> return f.uri
+    private fun typedMediaUri(f: ScannedFile): Uri = typedMediaUri(f.uri, f.name)
+
+    companion object {
+        /**
+         * Rebuilds a generic `MediaStore.Files` uri as a typed Images/Video/Audio uri, which
+         * `createTrashRequest` / `createDeleteRequest` require. Shared by the delete path and
+         * the Recently-Deleted restore/permanent-delete path (trashed items come back as Files
+         * uris). Row ids are shared across collections, so the remap is lossless.
+         */
+        fun typedMediaUri(uri: Uri, name: String): Uri {
+            if (uri.scheme != "content") return uri
+            val id = runCatching { ContentUris.parseId(uri) }.getOrNull() ?: return uri
+            val collection = when {
+                name.isImageName() -> MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                name.isVideoName() -> MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                name.isAudioName() -> MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                else               -> return uri
+            }
+            return ContentUris.withAppendedId(collection, id)
         }
-        return ContentUris.withAppendedId(collection, id)
     }
 
     /** Drops the stale MediaStore row after a file was moved to the app trash. */

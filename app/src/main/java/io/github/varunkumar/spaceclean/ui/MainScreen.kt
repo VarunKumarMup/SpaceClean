@@ -560,13 +560,12 @@ internal fun recommendedCleanupItems(uiState: HomeUiState): List<CleanupItem> {
             ?.forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Useless file") } }
     }
     if (QuickCleanCategory.AI.key in cats) {
-        (uiState.aiState as? AiState.Success)?.result?.let { ai ->
-            ai.blurry.forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Blurry (AI)") } }
-            ai.similarGroups.forEach { group ->
-                val keeper = aiKeeper(group)
-                group.filter { it.uri != keeper.uri }
-                    .forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Similar (AI)") } }
-            }
+        // Only the AI-confirmed near-identical duplicate extras — never blurry or screenshots,
+        // which are content-based judgments the user should review themselves.
+        (uiState.aiState as? AiState.Success)?.result?.similarGroups?.forEach { group ->
+            val keeper = aiKeeper(group)
+            group.filter { it.uri != keeper.uri }
+                .forEach { f -> out.getOrPut(f.uri) { CleanupItem(f, "Duplicate (AI)") } }
         }
     }
     return out.values.sortedByDescending { it.file.sizeBytes }

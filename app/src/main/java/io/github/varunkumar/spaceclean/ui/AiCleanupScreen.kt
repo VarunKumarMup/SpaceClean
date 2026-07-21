@@ -90,8 +90,10 @@ fun AiCleanupScreen(navController: NavHostController, viewModel: ScanViewModel) 
                 out[it.uri] = AiRow(it, "Similar shot", result.tags[it.uri], preselect = true)
             }
         }
+        // Blurry & screenshots are only SUGGESTED (never pre-checked) — the user decides,
+        // so a sharp portrait with a soft background is never auto-selected for deletion.
         result.blurry.forEach {
-            out.getOrPut(it.uri) { AiRow(it, "Blurry / low quality", result.tags[it.uri], preselect = true) }
+            out.getOrPut(it.uri) { AiRow(it, "Blurry / low quality", result.tags[it.uri], preselect = false) }
         }
         result.screenshots.forEach {
             out.getOrPut(it.uri) { AiRow(it, "Screenshot / meme", result.tags[it.uri], preselect = false) }
@@ -195,8 +197,9 @@ fun AiCleanupScreen(navController: NavHostController, viewModel: ScanViewModel) 
                 ) {
                     item {
                         val analyzed = (ai as? AiState.Success)?.result?.analyzedCount ?: 0
-                        Text("The AI looked at $analyzed photos and suggests ${rows.size} for cleanup. " +
-                            "Review and uncheck anything to keep — everything goes to the recoverable Trash.",
+                        Text("The AI looked at $analyzed photos. Only near-identical duplicates are " +
+                            "pre-checked — blurry shots and screenshots are just suggestions, so tick " +
+                            "the ones you actually want gone. Everything goes to the recoverable Trash.",
                             style = MaterialTheme.typography.labelMedium, color = TextMuted,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
                     }

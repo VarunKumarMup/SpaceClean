@@ -141,7 +141,7 @@ enum class QuickCleanCategory(
     FOLDERS   ("folders",    "Leftover folders", "Empty folders from uninstalled apps",        true),
     DOWNLOADS ("downloads",  "Download junk",    "Old APKs, ZIPs, logs & temp downloads",      true),
     USELESS   ("useless",    "Useless files",    "GIFs, temp, log & abandoned partial files",  true),
-    AI        ("ai",         "AI photo junk",    "Blurry shots & worse copies the AI found",    true),
+    AI        ("ai",         "AI duplicate photos", "Near-identical extras the AI confirmed",    false),
     DOCS      ("docs",       "Documents",        "PDFs & Office files — review these yourself", false);
 
     companion object {
@@ -395,12 +395,16 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     fun restoreFromTrash(items: List<TrashedItem>, onNeedsConfirmation: (IntentSender) -> Unit) {
         if (items.isEmpty()) return
         val appIds    = items.mapNotNull { it.appTrashId }.toSet()
-        val mediaUris = items.filter { it.appTrashId == null }.map { it.uri }
+        // System-media trashed items come back as generic Files uris — remap to typed
+        // Images/Video/Audio uris so createTrashRequest accepts them.
+        val mediaUris = items.filter { it.appTrashId == null }
+            .map { FileDeleter.typedMediaUri(it.uri, it.name) }
         viewModelScope.launch {
             if (appIds.isNotEmpty()) repository.restoreFromAppTrash(appIds)
             if (mediaUris.isEmpty()) { onTrashChanged(); return@launch }
             when (val r = deleter.initiateRestore(mediaUris)) {
                 is DeleteRequest.RequiresConfirmation -> onNeedsConfirmation(r.intentSender)
+                is DeleteRequest.Error -> { toast("Couldn't restore: ${r.message}"); onTrashChanged() }
                 else -> onTrashChanged()
             }
         }
@@ -410,12 +414,14 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     fun permanentlyDeleteTrash(items: List<TrashedItem>, onNeedsConfirmation: (IntentSender) -> Unit) {
         if (items.isEmpty()) return
         val appIds    = items.mapNotNull { it.appTrashId }.toSet()
-        val mediaUris = items.filter { it.appTrashId == null }.map { it.uri }
+        val mediaUris = items.filter { it.appTrashId == null }
+            .map { FileDeleter.typedMediaUri(it.uri, it.name) }
         viewModelScope.launch {
             if (appIds.isNotEmpty()) repository.purgeAppTrash(appIds)
             if (mediaUris.isEmpty()) { onTrashChanged(); return@launch }
             when (val r = deleter.initiatePermanentDelete(mediaUris)) {
                 is DeleteRequest.RequiresConfirmation -> onNeedsConfirmation(r.intentSender)
+                is DeleteRequest.Error -> { toast("Couldn't delete: ${r.message}"); onTrashChanged() }
                 else -> onTrashChanged()
             }
         }
