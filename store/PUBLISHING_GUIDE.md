@@ -7,11 +7,14 @@ first-time publisher. Do the sections in order.
 
 ## 0. Before you touch the Play Console
 
-- [ ] **Decide the app name** (see "App name & the 'AI' question" below).
-- [ ] **Decide Free vs Paid** (see "Pricing" below). This changes whether you need a
-      payments profile.
-- [ ] **Check the name isn't taken** — search the Play Store for your chosen name. If an
-      existing app owns it (especially a trademarked one), pick another to avoid a takedown.
+**Decisions locked in:** app name **"AI Space Cleaner"**, **Paid at $1.99 USD** (the standard
+"~$2" price point — set exactly $2.00 if you prefer). The name is honest because the app has a
+real, central on-device AI feature (AI Photo Cleanup).
+
+- [ ] **Check the name isn't taken** — search the Play Store for "AI Space Cleaner". "AI ...
+      Cleaner" is a crowded space; if an existing app (especially a trademarked one) owns the
+      exact name, tweak it (e.g. add a word) to avoid a takedown.
+- [ ] Because it's **Paid**, set up the payments/merchant profile early (see step 1).
 - [ ] Have the two hosted legal URLs ready (already live on your public GitHub):
   - Privacy Policy: `https://github.com/VarunKumarMup/SpaceClean/blob/main/store/PRIVACY_POLICY.md`
   - Terms/EULA: `https://github.com/VarunKumarMup/SpaceClean/blob/main/store/TERMS_OF_USE.md`
@@ -31,19 +34,19 @@ step must be done by you personally.
    a government ID and a D-U-N-S-style check). **This can take a few days — start it early.**
 5. Accept the Developer Distribution Agreement.
 
-> If you chose **Paid** (step 0), you must also set up a **Payments/merchant profile**
-> (Console → Setup → Payments profile) with tax and bank info before you can publish a paid
-> app. If you chose **Free**, you can skip this entirely.
+> **This app is Paid, so you MUST set up a Payments/merchant profile** (Console → Setup →
+> Payments profile) with tax and bank info before you can publish. This is often the slowest
+> part (tax forms + bank verification) — start it right after account setup.
 
 ---
 
 ## 2. Create the app
 
 Console → **Create app**:
-- App name: your chosen title (≤ 30 chars)
+- App name: **AI Space Cleaner**
 - Default language: English (United States)
 - App or game: **App**
-- Free or paid: your choice from step 0
+- Free or paid: **Paid**
 - Tick the two declarations (developer program policies, US export laws)
 
 ---
@@ -161,27 +164,22 @@ First production review can take a few days (longer with all-files access).
 
 ---
 
-## App name & the "AI" question
+## App name — "AI Space Cleaner" (resolved)
 
-Naming the app "AI ..." when it contains no AI/ML is a **Google Play Misrepresentation policy
-violation** and risks rejection or later removal — and "AI Cleaner" is a heavily
-spam-flagged, clone-saturated category. The app's matching (perceptual + content hashing) is
-clever but algorithmic, not AI. Safer, still-marketable directions:
+This name is now **honest and policy-safe** because the app ships a real, central on-device AI
+feature — **AI Photo Cleanup**, a bundled neural network (TensorFlow Lite) that finds blurry,
+near-duplicate, and screenshot photos entirely on-device. Make sure a screenshot of that screen
+is in your listing so the "AI" claim is visibly backed by the product (Google's reviewers check
+that "AI" in a title corresponds to a genuine feature). Keep the AI feature working in every
+release so the name stays truthful.
 
-- **Smart Space Cleaner — Offline** (keyword-rich, honest)
-- **SpaceClean** (keep it)
-- **Cleanup: Space & Duplicates**
+## Pricing — Paid $1.99 (resolved)
 
-If you genuinely want "AI" in the name, the honest path is to add a real on-device ML feature
-first (e.g. an on-device model for blurry/screenshot/meme classification) — a separate build.
-
-## Pricing
-
-Your goal was "most downloads as fast as possible." That points to **Free** — a paid app
-typically gets 10–50× fewer installs, and free also removes the payments-profile setup.
-Recommended launch: **Free**, optionally adding a paid "Pro" upgrade later once you have
-users. If you want revenue from day one instead, **$0.99–$1.99** is the usual floor, at a
-large cost to install numbers.
+Set to **$1.99 USD** (the conventional "~$2" price; set exactly $2.00 under Monetization if you
+want the round number). Reality check so you're not surprised: a paid app gets far fewer installs
+than a free one, and Google requires a payments/merchant profile before you can publish. If
+downloads stall, the usual playbook is to switch to **Free with a paid "Pro" upgrade** later —
+say the word and I'll add the in-app-purchase plumbing.
 
 ---
 

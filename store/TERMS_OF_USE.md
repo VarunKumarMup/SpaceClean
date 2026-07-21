@@ -1,10 +1,10 @@
-# End-User License Agreement & Terms of Use — SpaceClean
+# End-User License Agreement & Terms of Use — AI Space Cleaner
 
 **Effective date:** 20 July 2026
-**App:** SpaceClean (`io.github.varunkumar.spaceclean`)
+**App:** AI Space Cleaner (`io.github.varunkumar.spaceclean`)
 **Developer:** Varun Kumar Muppuri · varunkumarmuppuri@gmail.com
 
-By downloading, purchasing, or using SpaceClean ("the App"), you agree to this End-User
+By downloading, purchasing, or using AI Space Cleaner ("the App"), you agree to this End-User
 License Agreement ("Agreement"). If you do not agree, do not use the App.
 
 ## 1. License
@@ -21,7 +21,11 @@ and policies apply.
 ## 3. What the App does
 The App scans your device's on-device storage to help you find and delete unwanted files
 (duplicates, similar photos, large/old files, downloads, app-related media, leftover folders)
-and to uninstall apps you select. **All processing happens entirely on your device.**
+and to uninstall apps you select. It includes an **AI Photo Cleanup** feature that uses a
+machine-learning model bundled in the App to identify blurry, near-duplicate, and screenshot
+photos. **All processing, including the AI analysis, happens entirely on your device**, and the
+App has no internet permission. AI suggestions may be imprecise — you review and confirm every
+deletion, and the App is not liable for items you choose to delete (see sections 4, 7 and 8).
 
 ## 4. Deletion, Trash, and your responsibility
 - **You choose what to delete.** The App only removes items you confirm.

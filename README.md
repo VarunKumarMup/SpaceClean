@@ -1,10 +1,15 @@
-# SpaceClean 🧹
+# AI Space Cleaner 🧹
 
-A premium, **100% offline** Android storage cleaner. No internet permission, no ads, no
-analytics, no accounts — your files and scan results never leave your device, because
-there is no network code to send them.
+A premium, **100% offline** Android storage cleaner with **on-device AI**. No internet
+permission, no ads, no analytics, no accounts — your files and scan results never leave your
+device, because there is no network code to send them. Even the AI runs entirely on the phone.
+
+*(Project/package codename: `spaceclean` / `io.github.varunkumar.spaceclean`.)*
 
 ## Features
+
+- **AI Photo Cleanup (on-device)** — a bundled neural network (TensorFlow Lite) finds blurry,
+  near-duplicate, and screenshot photos with zero network access; you review before deleting.
 
 - **Smart Scan** — 12 categories scanned in one tap: photos, videos, apps, documents,
   audio, downloads, chat media, leftover folders, useless files, largest, old & unused,

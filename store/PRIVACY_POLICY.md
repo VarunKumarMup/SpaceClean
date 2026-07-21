@@ -1,19 +1,19 @@
-# Privacy Policy — SpaceClean
+# Privacy Policy — AI Space Cleaner
 
 **Effective date:** 29 June 2026
-**App:** SpaceClean (`io.github.varunkumar.spaceclean`)
+**App:** AI Space Cleaner (`io.github.varunkumar.spaceclean`)
 **Developer contact:** varunkumarmuppuri@gmail.com
 
 ## Summary
 
-SpaceClean is a **100% offline** storage cleaner and file manager. It **does not collect,
+AI Space Cleaner is a **100% offline** storage cleaner and file manager. It **does not collect,
 transmit, sell, or share any personal data**. Everything the app does happens **entirely on
 your device**. The app contains **no internet permission**, no advertising, no analytics, and
 no third‑party SDKs — so there is no technical means by which your data could leave your phone.
 
 ## Data we collect
 
-**None.** SpaceClean does not collect or transmit any personal or device information. It has no
+**None.** AI Space Cleaner does not collect or transmit any personal or device information. It has no
 servers, no accounts, and no network code.
 
 The app reads your files, media, and the list of installed apps **only on your device and only
@@ -34,8 +34,10 @@ The app intentionally **does not request the INTERNET permission.**
 
 ## How your data is used
 
-All scanning, previewing, hashing (for duplicate detection), and deletion happens locally on
-your device. Deleted files are moved to a recoverable Trash for about 30 days: photos, videos and
+All scanning, previewing, hashing (for duplicate detection), **AI photo analysis**, and
+deletion happens locally on your device. The AI Photo Cleanup feature uses a machine-learning
+model bundled inside the app; it analyzes your photos entirely on-device and never uploads any
+photo, image data, or analysis result — the app has no internet permission at all. Deleted files are moved to a recoverable Trash for about 30 days: photos, videos and
 audio use your device's own system Trash (via your Files/Photos app), and other files use a private
 trash folder inside the app's own storage. You can restore or permanently remove them at any time
 from Settings → Recently Deleted. Only empty leftover folders are removed directly. No file content
@@ -47,7 +49,7 @@ We do not share any data with anyone, because no data is collected or leaves you
 
 ## Children's privacy
 
-SpaceClean does not collect data from anyone, including children. It is suitable for all ages.
+AI Space Cleaner does not collect data from anyone, including children. It is suitable for all ages.
 
 ## Security
 

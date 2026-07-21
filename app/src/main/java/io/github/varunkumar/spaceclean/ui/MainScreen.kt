@@ -637,17 +637,21 @@ private fun DashboardHeader(savedBytes: Long, onTrash: () -> Unit, onSearch: () 
     ) {
         Column(Modifier.weight(1f)) {
             Text(
-                "SpaceClean",
-                style      = MaterialTheme.typography.headlineMedium,
+                "AI Space Cleaner",
+                style      = MaterialTheme.typography.titleLarge,
                 color      = TextPrimary,
                 fontWeight = FontWeight.Black,
+                maxLines   = 1,
+                overflow   = TextOverflow.Ellipsis,
             )
             Text(
-                "OFFLINE  •  PRIVATE",
+                "OFFLINE  •  PRIVATE  •  ON-DEVICE AI",
                 style         = MaterialTheme.typography.labelSmall,
                 color         = ElectricCyan.copy(alpha = 0.6f),
-                letterSpacing = 1.5.sp,
+                letterSpacing = 1.2.sp,
                 fontWeight    = FontWeight.SemiBold,
+                maxLines      = 1,
+                overflow      = TextOverflow.Ellipsis,
             )
         }
 
