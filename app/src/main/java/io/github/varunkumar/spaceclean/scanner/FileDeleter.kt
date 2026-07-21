@@ -2,10 +2,10 @@ package io.github.varunkumar.spaceclean.scanner
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Context
 import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,9 +14,9 @@ import java.io.File
 sealed class DeleteRequest {
     /**
      * API 30+: launch this [intentSender]; call back with RESULT_OK to confirm.
-     * [alreadyDeleted] lists any non-media / file:// items that were removed directly
-     * BEFORE the dialog — the caller must prune those immediately, because they are
-     * gone from disk even if the user cancels the dialog.
+     * [alreadyDeleted] lists non-media / file items that were already moved to the
+     * app trash BEFORE the dialog — the caller prunes those immediately, because they
+     * are already gone from their original location even if the user cancels the dialog.
      */
     data class RequiresConfirmation(
         val intentSender:   IntentSender,
@@ -24,7 +24,8 @@ sealed class DeleteRequest {
     ) : DeleteRequest()
 
     /**
-     * Files were removed directly with no dialog. [deletedUris] lists exactly what was
+     * Files were removed directly with no dialog (everything is recoverable — media in the
+     * system Trash, other files in the app trash). [deletedUris] lists exactly what was
      * removed; [failedCount] is how many items could not be removed (surfaced to the user
      * instead of failing silently).
      */
@@ -34,21 +35,23 @@ sealed class DeleteRequest {
 }
 
 /**
- * Deletion strategies by item kind:
+ * Deletion strategies, all of them recoverable:
  *
- * **Media (images / videos / audio)** — sent to the **system Trash** (recoverable ~30
- * days) via [MediaStore.createTrashRequest] on API 30+. `createTrashRequest` ONLY accepts
- * URIs from the Images/Video/Audio collections — a `MediaStore.Files` URI (as produced by
- * the Documents / Downloads / Largest / Old-files scans) makes it throw. Media URIs are
- * therefore remapped to their proper typed collection by MediaStore row id first.
+ * **Media (images / videos / audio)** — sent to Android's **system Trash** (recoverable
+ * ~30 days) via [MediaStore.createTrashRequest] on API 30+. That API only accepts URIs
+ * from the Images/Video/Audio collections, so a `MediaStore.Files` URI is remapped to its
+ * typed collection by row id first.
  *
- * **Non-media `content://`** (PDFs, APKs, archives, logs…) — MediaStore has no Trash for
- * these; they are deleted directly through [ContentResolver.delete] (permitted broadly by
- * All-Files-Access), with a filesystem fallback for rows the resolver refuses.
+ * **Every other file** (PDFs, APKs, archives, chat media, `file://` items…) — MediaStore
+ * has no Trash for these, so they are moved into SpaceClean's own [AppTrash] (also ~30-day
+ * recoverable) instead of being permanently deleted.
  *
- * **`file://` URIs** (orphan folders, chat media) — deleted via [File.deleteRecursively].
+ * **Directories** (empty leftover / orphan folders) — nothing to recover, removed directly.
  */
-class FileDeleter(private val contentResolver: ContentResolver) {
+class FileDeleter(context: Context) {
+
+    private val contentResolver: ContentResolver = context.contentResolver
+    private val appTrash = AppTrash(context)
 
     suspend fun initiateDelete(files: List<ScannedFile>): DeleteRequest = withContext(Dispatchers.IO) {
         if (files.isEmpty()) return@withContext DeleteRequest.DirectSuccess(emptyList())
@@ -56,25 +59,22 @@ class FileDeleter(private val contentResolver: ContentResolver) {
         val deleted = mutableListOf<Uri>()
         var failed  = 0
 
-        // 1. file:// URIs (folders + legacy paths) — recursive direct delete.
-        for (f in files.filter { it.uri.scheme == "file" }) {
-            runCatching {
-                val file = File(requireNotNull(f.uri.path))
-                if (!file.exists() || file.deleteRecursively()) deleted += f.uri else failed++
-            }.onFailure { failed++ }
+        val (media, others) = files.partition {
+            it.uri.scheme == "content" &&
+                (it.name.isImageName() || it.name.isVideoName() || it.name.isAudioName())
         }
 
-        val contentFiles = files.filter { it.uri.scheme == "content" }
-        val (media, nonMedia) = contentFiles.partition {
-            it.name.isImageName() || it.name.isVideoName() || it.name.isAudioName()
+        // 1. Non-media (any scheme): directories delete directly, files go to the app trash.
+        for (f in others) {
+            val handled = when {
+                isDirectory(f)          -> deleteDirectory(f)
+                appTrash.trash(f)       -> { removeMediaStoreRow(f); true }
+                else                    -> false
+            }
+            if (handled) deleted += f.uri else failed++
         }
 
-        // 2. Non-media content:// — no Trash support; delete directly.
-        for (f in nonMedia) {
-            if (deleteContentRow(f)) deleted += f.uri else failed++
-        }
-
-        // 3. Media content:// — recoverable Trash on API 30+, direct delete below that.
+        // 2. Media content:// — recoverable system Trash on API 30+, else app trash.
         if (media.isEmpty()) {
             return@withContext DeleteRequest.DirectSuccess(deleted, failed)
         }
@@ -84,22 +84,21 @@ class FileDeleter(private val contentResolver: ContentResolver) {
                 val pi = MediaStore.createTrashRequest(contentResolver, trashUris, true)
                 DeleteRequest.RequiresConfirmation(pi.intentSender, alreadyDeleted = deleted)
             }.getOrElse {
-                // Trash request refused (odd row, huge batch…) — fall back to direct
-                // per-item deletion so the button is never dead.
+                // Trash request refused — fall back to the app trash so nothing is dead.
                 for (f in media) {
-                    if (deleteContentRow(f)) deleted += f.uri else failed++
+                    if (appTrash.trash(f)) { removeMediaStoreRow(f); deleted += f.uri } else failed++
                 }
                 DeleteRequest.DirectSuccess(deleted, failed)
             }
         } else {
             for (f in media) {
-                if (deleteContentRow(f)) deleted += f.uri else failed++
+                if (appTrash.trash(f)) { removeMediaStoreRow(f); deleted += f.uri } else failed++
             }
             DeleteRequest.DirectSuccess(deleted, failed)
         }
     }
 
-    /** Restores trashed items back to normal (untrash). content:// only, API 30+. */
+    /** Restores system-Trash items (untrash). content:// only, API 30+. */
     suspend fun initiateRestore(uris: List<Uri>): DeleteRequest = withContext(Dispatchers.IO) {
         val contentUris = uris.filter { it.scheme == "content" }
         if (contentUris.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
@@ -111,7 +110,7 @@ class FileDeleter(private val contentResolver: ContentResolver) {
         }.getOrElse { e -> DeleteRequest.Error(e.message ?: "Failed to build restore request") }
     }
 
-    /** Permanently deletes items (used from the in-app Trash). content:// only, API 30+. */
+    /** Permanently deletes system-Trash items. content:// only, API 30+. */
     suspend fun initiatePermanentDelete(uris: List<Uri>): DeleteRequest = withContext(Dispatchers.IO) {
         val contentUris = uris.filter { it.scheme == "content" }
         if (contentUris.isEmpty()) return@withContext DeleteRequest.DirectSuccess(emptyList())
@@ -131,6 +130,16 @@ class FileDeleter(private val contentResolver: ContentResolver) {
 
     // ── Internals ─────────────────────────────────────────────────────────────
 
+    private fun isDirectory(f: ScannedFile): Boolean {
+        if (f.uri.scheme != "file") return false
+        return runCatching { File(requireNotNull(f.uri.path)).isDirectory }.getOrDefault(false)
+    }
+
+    private fun deleteDirectory(f: ScannedFile): Boolean = runCatching {
+        val dir = File(requireNotNull(f.uri.path))
+        !dir.exists() || dir.deleteRecursively()
+    }.getOrDefault(false)
+
     /**
      * Rebuilds a URI in the typed media collection (Images/Video/Audio) that
      * `createTrashRequest` requires. MediaStore row ids are shared across the Files
@@ -147,23 +156,9 @@ class FileDeleter(private val contentResolver: ContentResolver) {
         return ContentUris.withAppendedId(collection, id)
     }
 
-    /**
-     * Deletes one content:// row, falling back to the raw filesystem path (rebuilt from
-     * the scan's relative path — valid under All-Files-Access) when the resolver refuses.
-     */
-    private fun deleteContentRow(f: ScannedFile): Boolean {
-        val viaResolver = runCatching { contentResolver.delete(f.uri, null, null) > 0 }
-            .getOrDefault(false)
-        if (viaResolver) return true
-
-        return runCatching {
-            val abs = File(Environment.getExternalStorageDirectory(), "${f.path}/${f.name}")
-            if (abs.isFile && abs.delete()) {
-                // Remove the stale MediaStore row so re-scans don't resurrect a ghost entry.
-                runCatching { contentResolver.delete(f.uri, null, null) }
-                true
-            } else false
-        }.getOrDefault(false)
+    /** Drops the stale MediaStore row after a file was moved to the app trash. */
+    private fun removeMediaStoreRow(f: ScannedFile) {
+        if (f.uri.scheme == "content") runCatching { contentResolver.delete(f.uri, null, null) }
     }
 }
 

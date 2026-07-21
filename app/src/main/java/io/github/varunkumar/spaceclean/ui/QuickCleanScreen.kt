@@ -106,13 +106,38 @@ fun QuickCleanScreen(navController: NavHostController, viewModel: ScanViewModel)
                     Column {
                         Text("Quick Clean", style = MaterialTheme.typography.titleLarge,
                             color = TextPrimary, fontWeight = FontWeight.Bold)
-                        Text("Review before deleting · media goes to Trash",
+                        Text("Review before deleting · all recoverable for ~30 days",
                             style = MaterialTheme.typography.labelMedium, color = TextSecondary)
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Rounded.ArrowBackIosNew, "Back", tint = ElectricCyan)
+                    }
+                },
+                actions = {
+                    val all = items + suggestions
+                    val allSelected = all.isNotEmpty() && all.all { selected[it.file.uri] == true }
+                    if (all.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier.padding(end = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            NeonCheckbox(
+                                checked = allSelected,
+                                onCheckedChange = { chk ->
+                                    if (chk) all.forEach { selected[it.file.uri] = true }
+                                    else all.forEach { selected.remove(it.file.uri) }
+                                },
+                            )
+                            Text(
+                                if (allSelected) "None" else "All",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (allSelected) ElectricCyan else TextSecondary,
+                                fontWeight = if (allSelected) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),

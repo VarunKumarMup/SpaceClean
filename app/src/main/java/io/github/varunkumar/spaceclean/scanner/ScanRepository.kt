@@ -18,6 +18,7 @@ class ScanRepository(private val context: Context) {
     private val appScanner    = AppStorageScanner(context)
     private val advCleaners   = AdvancedCleaners(context)
     private val dupScanner    = DuplicateScanner(context)
+    private val appTrash      = AppTrash(context)
 
     // ── Photos — exact duplicates + similar/burst photos combined ─────────────
 
@@ -121,7 +122,21 @@ class ScanRepository(private val context: Context) {
     // we can enumerate every trashed item and offer restore / permanent delete.
 
     suspend fun getTrashedItems(): List<TrashedItem> = withContext(Dispatchers.IO) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return@withContext emptyList()
+        // App-managed trash (documents, APKs, chat media…) — available on every API level.
+        val appItems = appTrash.list().map { e ->
+            TrashedItem(
+                uri        = appTrash.storedUri(e),
+                name       = e.name,
+                sizeBytes  = e.sizeBytes,
+                expiresMs  = e.expiresMs,
+                appTrashId = e.id,
+            )
+        }
+
+        // System media Trash (photos/videos/audio) — API 30+ only.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return@withContext appItems.sortedByDescending { it.expiresMs }
+        }
 
         val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
         val projection = arrayOf(
@@ -157,8 +172,16 @@ class ScanRepository(private val context: Context) {
                 }
             }
         }
-        out
+        (appItems + out).sortedByDescending { it.expiresMs }
     }
+
+    // ── App-managed trash operations (non-media recoverable files) ─────────────
+
+    suspend fun restoreFromAppTrash(ids: Set<String>): Int =
+        withContext(Dispatchers.IO) { appTrash.restore(ids) }
+
+    suspend fun purgeAppTrash(ids: Set<String>): Int =
+        withContext(Dispatchers.IO) { appTrash.purge(ids) }
 
     // ── Storage statistics ────────────────────────────────────────────────────
 

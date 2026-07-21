@@ -1,12 +1,8 @@
 # End-User License Agreement & Terms of Use — SpaceClean
 
-**Effective date:** [set on publish]
+**Effective date:** 20 July 2026
 **App:** SpaceClean (`io.github.varunkumar.spaceclean`)
 **Developer:** Varun Kumar Muppuri · varunkumarmuppuri@gmail.com
-
-> **ACTION REQUIRED BEFORE PUBLISHING:** replace every `[...]` placeholder (effective date
-> and governing-law jurisdiction) and host this document at a public URL. It is referenced
-> from the Play listing.
 
 By downloading, purchasing, or using SpaceClean ("the App"), you agree to this End-User
 License Agreement ("Agreement"). If you do not agree, do not use the App.
@@ -31,16 +27,18 @@ and to uninstall apps you select. **All processing happens entirely on your devi
 - **You choose what to delete.** The App only removes items you confirm.
 - **Deleting files is your responsibility.** You are solely responsible for the files you
   choose to delete and for keeping your own backups of anything important.
-- Where Android supports it, deleted photos and videos are moved to the **system Trash** and
-  remain recoverable for a period set by your device/operating system (typically about 30
-  days) before Android removes them automatically. Some items — including chat-app media and
-  folders — are removed directly and **cannot be recovered** through the App.
-- The App does **not** guarantee that any deleted item can be recovered.
+- Deleted files are placed in a **recoverable Trash** for approximately 30 days before being
+  removed automatically. Photos, videos, and audio use your device's own system Trash; other
+  files use a private trash folder inside the App's storage. You can restore or permanently
+  delete them at any time from Settings → Recently Deleted. Empty leftover folders are removed
+  directly.
+- The App does **not** guarantee that any deleted item can be recovered, and retention periods
+  may vary by device and Android version. You remain responsible for keeping your own backups.
 
 ## 5. Privacy
 The App collects, transmits, and shares **no** personal data. It has no internet permission,
 no ads, no analytics, and no accounts. See the Privacy Policy for full details:
-[Privacy Policy URL].
+https://github.com/VarunKumarMup/SpaceClean/blob/main/store/PRIVACY_POLICY.md
 
 ## 6. Acceptable use
 You agree not to: (a) reverse engineer, decompile, or modify the App except as permitted by
@@ -71,9 +69,10 @@ This license ends automatically if you breach this Agreement. On termination you
 using and uninstall the App.
 
 ## 11. Governing law
-This Agreement is governed by the laws of **[India / your state or country]**, without regard
-to conflict-of-law rules. Nothing in this Agreement limits any non-waivable consumer rights
-you may have under the mandatory law of your country of residence.
+This Agreement is governed by the laws of the **United States** and, to the extent applicable,
+the state in which the Developer resides, without regard to conflict-of-law rules. Nothing in
+this Agreement limits any non-waivable consumer rights you may have under the mandatory law of
+your country or state of residence.
 
 ## 12. Contact
 Questions about these terms: **varunkumarmuppuri@gmail.com**

@@ -35,9 +35,11 @@ The app intentionally **does not request the INTERNET permission.**
 ## How your data is used
 
 All scanning, previewing, hashing (for duplicate detection), and deletion happens locally on
-your device. Deleted media is moved to your device's system Trash where supported (recoverable
-for about 30 days via your Files/Photos app); some items, such as chat‑app media and folders you
-select manually, are deleted directly.
+your device. Deleted files are moved to a recoverable Trash for about 30 days: photos, videos and
+audio use your device's own system Trash (via your Files/Photos app), and other files use a private
+trash folder inside the app's own storage. You can restore or permanently remove them at any time
+from Settings → Recently Deleted. Only empty leftover folders are removed directly. No file content
+leaves your device at any point.
 
 ## Data sharing
 

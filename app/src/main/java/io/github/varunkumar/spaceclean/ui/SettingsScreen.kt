@@ -328,9 +328,10 @@ private val FAQS = listOf(
         "Yes. SpaceClean has no internet permission at all — you can verify it in the app's " +
         "permission list. Nothing is ever uploaded, and there are no ads, trackers, or accounts.",
     "Where do deleted files go?" to
-        "Photos and videos go to Android's system Trash and stay recoverable — open Settings → " +
-        "Recently Deleted to restore them or delete them for good. Android auto-removes them after " +
-        "about 30 days. Chat-app media and folders are removed directly and can't be restored.",
+        "Everything goes to a recoverable Trash for about 30 days — open Settings → Recently Deleted " +
+        "to restore anything or delete it for good. Photos and videos use Android's own system Trash; " +
+        "documents, APKs and other files use SpaceClean's built-in trash. Only empty leftover folders " +
+        "are removed directly.",
     "How does duplicate detection work?" to
         "It compares the actual content of files (a hash), so it only flags true duplicates — even " +
         "across phone storage and WhatsApp. Similar photos are matched by how they look, not by name.",

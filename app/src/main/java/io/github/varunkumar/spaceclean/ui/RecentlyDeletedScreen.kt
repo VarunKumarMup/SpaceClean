@@ -126,7 +126,7 @@ fun RecentlyDeletedScreen(navController: NavHostController, viewModel: ScanViewM
                         icon = Icons.Rounded.Restore, label = "Restore ${picked.size}", tint = SuccessGreen,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            viewModel.restoreFromTrash(picked.map { it.uri }) { sender ->
+                            viewModel.restoreFromTrash(picked) { sender ->
                                 opLauncher.launch(IntentSenderRequest.Builder(sender).build())
                             }
                         },
@@ -135,7 +135,7 @@ fun RecentlyDeletedScreen(navController: NavHostController, viewModel: ScanViewM
                         icon = Icons.Rounded.DeleteForever, label = "Delete", tint = ErrorRed,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            viewModel.permanentlyDeleteTrash(picked.map { it.uri }) { sender ->
+                            viewModel.permanentlyDeleteTrash(picked) { sender ->
                                 opLauncher.launch(IntentSenderRequest.Builder(sender).build())
                             }
                         },
@@ -167,7 +167,7 @@ fun RecentlyDeletedScreen(navController: NavHostController, viewModel: ScanViewM
             ) {
                 item {
                     Text(
-                        "Files here are recoverable until the shown date, then Android removes them automatically. Some items (chat-app media, folders) were deleted directly and don't appear here.",
+                        "Everything you delete lands here and stays recoverable until the shown date (about 30 days), then it's removed automatically. Empty leftover folders are the only thing deleted directly.",
                         style = MaterialTheme.typography.labelSmall, color = TextMuted,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
                     )

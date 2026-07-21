@@ -571,9 +571,9 @@ fun DeleteConfirmDialog(
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "${bytes.toReadableSize()} · Photos, videos & audio move to your device " +
-                        "Trash (recoverable ~30 days). Documents, APKs and folders are " +
-                        "deleted immediately and can't be restored.",
+                    "${bytes.toReadableSize()} · Everything moves to the recoverable Trash " +
+                        "for ~30 days — photos & videos to your device Trash, other files to " +
+                        "SpaceClean's. Restore anytime from Recently Deleted.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                 )

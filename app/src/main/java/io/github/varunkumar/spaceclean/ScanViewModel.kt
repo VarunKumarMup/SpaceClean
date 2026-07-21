@@ -146,7 +146,7 @@ enum class QuickCleanCategory(
 class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = ScanRepository(application)
-    private val deleter    = FileDeleter(application.contentResolver)
+    private val deleter    = FileDeleter(application)
     private val prefs      = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private var pendingDeleteFiles: List<ScannedFile> = emptyList()
@@ -361,11 +361,18 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Restore trashed items (untrash). The screen launches the returned intent sender. */
-    fun restoreFromTrash(uris: List<Uri>, onNeedsConfirmation: (IntentSender) -> Unit) {
-        if (uris.isEmpty()) return
+    /**
+     * Restore trashed items (untrash). App-trash items are restored in place; system-media
+     * items need the returned intent sender launched by the screen.
+     */
+    fun restoreFromTrash(items: List<TrashedItem>, onNeedsConfirmation: (IntentSender) -> Unit) {
+        if (items.isEmpty()) return
+        val appIds    = items.mapNotNull { it.appTrashId }.toSet()
+        val mediaUris = items.filter { it.appTrashId == null }.map { it.uri }
         viewModelScope.launch {
-            when (val r = deleter.initiateRestore(uris)) {
+            if (appIds.isNotEmpty()) repository.restoreFromAppTrash(appIds)
+            if (mediaUris.isEmpty()) { onTrashChanged(); return@launch }
+            when (val r = deleter.initiateRestore(mediaUris)) {
                 is DeleteRequest.RequiresConfirmation -> onNeedsConfirmation(r.intentSender)
                 else -> onTrashChanged()
             }
@@ -373,10 +380,14 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /** Permanently delete trashed items now (skip the ~30-day wait). */
-    fun permanentlyDeleteTrash(uris: List<Uri>, onNeedsConfirmation: (IntentSender) -> Unit) {
-        if (uris.isEmpty()) return
+    fun permanentlyDeleteTrash(items: List<TrashedItem>, onNeedsConfirmation: (IntentSender) -> Unit) {
+        if (items.isEmpty()) return
+        val appIds    = items.mapNotNull { it.appTrashId }.toSet()
+        val mediaUris = items.filter { it.appTrashId == null }.map { it.uri }
         viewModelScope.launch {
-            when (val r = deleter.initiatePermanentDelete(uris)) {
+            if (appIds.isNotEmpty()) repository.purgeAppTrash(appIds)
+            if (mediaUris.isEmpty()) { onTrashChanged(); return@launch }
+            when (val r = deleter.initiatePermanentDelete(mediaUris)) {
                 is DeleteRequest.RequiresConfirmation -> onNeedsConfirmation(r.intentSender)
                 else -> onTrashChanged()
             }
