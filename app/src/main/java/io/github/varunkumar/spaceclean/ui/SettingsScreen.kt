@@ -230,6 +230,9 @@ fun SettingsScreen(navController: NavHostController, viewModel: ScanViewModel) {
             // ── Contact developer ─────────────────────────────────────────────
             ContactSection()
 
+            // ── Open-source licenses (Apache-2.0 attribution) ─────────────────
+            LicensesSection()
+
             Spacer(Modifier.height(8.dp))
             Text(
                 "SpaceClean  ·  v$versionName",
@@ -428,6 +431,68 @@ private fun ContactSection() {
                 }
             },
         )
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Open-source licenses (satisfies Apache-2.0 attribution inside the app)
+// ─────────────────────────────────────────────────────────────────────────────
+
+private const val LICENSES_TEXT =
+    "AI Space Cleaner includes open-source components licensed under the Apache License 2.0 " +
+    "(apache.org/licenses/LICENSE-2.0), each used as-is and running entirely on your device:\n\n" +
+    "• Android Jetpack / AndroidX — © The Android Open Source Project\n" +
+    "• Jetpack Compose & Material 3 — © The Android Open Source Project\n" +
+    "• AndroidX Media3 (ExoPlayer) — © Google LLC\n" +
+    "• Kotlin & Kotlin Coroutines — © JetBrains s.r.o.\n" +
+    "• TensorFlow Lite — © The TensorFlow Authors\n" +
+    "• MobileNet v1 model — © Google LLC, via the TensorFlow project (Apache 2.0). Bundled " +
+    "unmodified; powers on-device AI Photo Cleanup. No image or inference data leaves your device.\n\n" +
+    "Licensed under the Apache License 2.0. Distributed on an \"AS IS\" BASIS, without warranties " +
+    "or conditions of any kind."
+
+@Composable
+private fun LicensesSection() {
+    var expanded by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            "OPEN-SOURCE LICENSES",
+            style      = MaterialTheme.typography.labelSmall,
+            color      = ElectricCyan.copy(0.7f),
+            fontWeight = FontWeight.Bold,
+            modifier   = Modifier.padding(start = 4.dp, top = 2.dp),
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(CyberCard)
+                .border(1.dp, ElectricCyan.copy(0.1f), RoundedCornerShape(14.dp))
+                .clickable { expanded = !expanded }
+                .padding(16.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Open-source licenses",
+                    style      = MaterialTheme.typography.bodyMedium,
+                    color      = TextPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier   = Modifier.weight(1f),
+                )
+                Icon(
+                    if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    null, tint = TextMuted, modifier = Modifier.size(22.dp),
+                )
+            }
+            AnimatedVisibility(visible = expanded) {
+                Text(
+                    LICENSES_TEXT,
+                    style    = MaterialTheme.typography.labelMedium,
+                    color    = TextSecondary,
+                    modifier = Modifier.padding(top = 10.dp),
+                )
+            }
+        }
     }
 }
 
