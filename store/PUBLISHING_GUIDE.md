@@ -1,7 +1,38 @@
-# SpaceClean — Complete Publishing Guide
+# AI Space Cleaner — Complete Publishing Guide
 
 Everything needed to go from the built app to a live Google Play listing, written for a
 first-time publisher. Do the sections in order.
+
+---
+
+## ⚡ FASTEST PATH TO LIVE (read this first)
+
+**Honest timeline: ~2.5–3 weeks for a new personal account.** The app is done; the delay is
+entirely Google's gates. Three things set the clock, so start all three TODAY and run
+everything else in parallel:
+
+1. **Identity verification** — start the moment you create the account (can take days).
+2. **The 12-tester / 14-day closed test** — Google requires new *personal* developer accounts
+   to run a **Closed testing** track with **at least 12 testers who opt in, for 14 continuous
+   days**, before you may even apply for production. **This is the long pole.** Upload the AAB
+   to Closed testing and send the opt-in link to 12+ people (friends/family Google accounts —
+   they just tap the link, install once, and stay opted in) on **day one**.
+3. **Payments/merchant profile** — required because the app is Paid; tax + bank verification
+   also takes days.
+
+While those clocks run (days 1–14), complete the store listing, data-safety form, content
+rating, target audience, permission declarations, and screenshots — none of it blocks the
+14-day timer. On/after day 14, with 12 testers still opted in, **apply for production access**,
+promote the build to Production, and submit. Then Google's review (a few days, longer because
+of all-files access) is the last wait.
+
+> **The single biggest speed lever:** start the Closed test with 12 testers on the first day.
+> Every day you delay recruiting testers is a day added to the end. Do NOT remove testers or
+> pause the track during the 14 days, or the counter can reset.
+>
+> *(Want it even faster / fewer hoops? Launching **Free** removes the payments-profile step and
+> a paid app's extra friction — but you chose Paid, so the payments profile stays on the
+> critical path.)*
 
 ---
 
