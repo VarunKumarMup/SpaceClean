@@ -4,6 +4,33 @@ Google requires a new personal developer account to run a **Closed testing** tra
 testers opted in for 14 continuous days** before you can apply for production. This is the long
 pole, so start it the same day verification completes.
 
+## No friends/testers? Here's how to get 12 (very common — you don't need people you know)
+
+The testers just have to opt in and keep the app installed — near-zero effort — so strangers
+work fine. Best options, in order:
+
+1. **Tester-exchange communities (free, standard solution).** Indie devs test each other's apps
+   to clear this exact requirement. Search for "Google Play closed testing tester exchange":
+   - Reddit: **r/androiddev** (weekly tester threads), **r/googleplaytesting**, **r/AndroidTesting**
+   - Discord / Telegram groups dedicated to Play closed-testing exchanges
+   How it works: you post your opt-in link + join link, add the people who reply as testers, and
+   in return you install and keep *their* test apps. Get ~15 (a few extra as buffer) so you stay
+   above 12 for the full 14 days.
+2. **Anyone with an Android phone + a Gmail** — not just "friends": coworkers, classmates,
+   relatives, neighbours, people in any online community you're already in. They don't need to be
+   technical or ever open the app.
+3. **Paid tester services** (last resort, costs money) — some services supply the 12 testers for
+   a fee. Vet them carefully; quality varies and a few are scammy. Only if you can't get free
+   testers.
+
+**Do NOT** try to fake it with your own extra Google accounts / emulators. Google detects
+duplicate-device / self-testing patterns, and it can fail verification or get the account
+terminated. Real, distinct testers only.
+
+> There is genuinely no way for a **personal** account to skip the 12-tester/14-day gate. (Only
+> **organization** accounts are exempt, and that needs a D-U-N-S business number and a separate
+> account — not worth switching now that your individual ID is already submitted.)
+
 ## Prep you can do NOW (while waiting on verification)
 
 - [ ] **Line up 12+ people** with **Android** phones (friends/family). Make a list of their
