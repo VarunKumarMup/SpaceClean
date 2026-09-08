@@ -31,7 +31,48 @@ terminated. Real, distinct testers only.
 > **organization** accounts are exempt, and that needs a D-U-N-S business number and a separate
 > account — not worth switching now that your individual ID is already submitted.)
 
-## Prep you can do NOW (while waiting on verification)
+## Recruitment post for tester-exchange communities
+
+**Pro tip that makes strangers easy:** create a **public Google Group**, set it as your tester
+list in Console, and share the group's join link. Anyone who joins the group becomes a tester
+automatically — you never have to collect 12 individual emails. (groups.google.com → Create
+group → set "Who can join" to "Anyone can ask" or "Anyone can join".)
+
+### Reddit version (title + body)
+
+**Title:** `[Tester Exchange] Need 12 testers for my offline AI cleaner app — I'll test yours back (14 days)`
+
+**Body:**
+> Hi all — solo dev launching my first app, need to clear Google's 12-tester / 14-day closed-test
+> requirement. Happy to test yours in return — drop your link in the comments and I'll join.
+>
+> **App: AI Space Cleaner** — a 100% offline Android storage cleaner. No internet permission, no
+> ads, no tracking. Finds duplicate & similar photos, large/junk files, cleans WhatsApp/Telegram
+> media, and has an **on-device AI photo cleanup** (bundled TensorFlow Lite — nothing ever leaves
+> your phone).
+>
+> **To join (2 min, Android):**
+> 1. Join the tester group: **[GOOGLE GROUP LINK]**
+> 2. Opt in here: **[PLAY OPT-IN LINK]**
+> 3. Install from Play and keep it installed for 14 days. That's it — you don't have to use it.
+>
+> Comment your app's opt-in link and I'll test back. Thanks so much! 🙏
+
+### Discord / Telegram version (one-liner)
+
+> Solo dev, need 12 testers (14 days) for **AI Space Cleaner** — offline Android cleaner + on-device
+> AI, no internet/ads/tracking. I'll test yours back! Join: **[GROUP LINK]** → opt-in:
+> **[OPT-IN LINK]** → install & keep 14 days. Drop your link 👇
+
+### Where to post
+
+- Reddit: **r/androiddev**, **r/googleplaytesting**, **r/AndroidTesters**, **r/TestMyApp**
+  (search Reddit for "closed testing tester exchange" for the current active threads — names change)
+- **Discord / Telegram:** search "Google Play closed testing tester exchange Discord" — several
+  active servers exist specifically for this
+- Follow each community's rules (many have a dedicated weekly thread for these posts)
+
+### Prep you can do NOW (while waiting on verification)
 
 - [ ] **Line up 12+ people** with **Android** phones (friends/family). Make a list of their
       **Gmail addresses** — those are what you add as testers. Text them now so they're ready.
